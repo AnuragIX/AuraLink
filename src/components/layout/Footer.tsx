@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { siteConfig } from '../../config/siteConfig';
+import { isSafeHttpUrl, isValidContactEmail } from '../../utils/urlValidation';
 import { AuraLinkMark, NAV_ITEMS } from '../navigation/Navbar';
 
 interface FooterProps {
@@ -9,10 +10,11 @@ interface FooterProps {
 
 export function Footer({ onNavigate }: FooterProps) {
   const { contact, socialLinks } = siteConfig;
-  const hasEmail = Boolean(contact.email.trim());
+  const trimmedEmail = contact.email.trim();
+  const hasEmail = isValidContactEmail(trimmedEmail);
   const hasLocation = Boolean(contact.location.trim());
   const validSocialLinks = socialLinks.filter(
-    (link) => link.label.trim() && /^https?:\/\//i.test(link.url.trim()),
+    (link) => Boolean(link.label.trim()) && isSafeHttpUrl(link.url),
   );
 
   return (
@@ -103,10 +105,10 @@ export function Footer({ onNavigate }: FooterProps) {
               {hasEmail ? (
                 <p>
                   <a
-                    href={`mailto:${contact.email}`}
+                    href={`mailto:${trimmedEmail}`}
                     className="text-[var(--accent-primary)] hover:underline"
                   >
-                    {contact.email}
+                    {trimmedEmail}
                   </a>
                 </p>
               ) : null}

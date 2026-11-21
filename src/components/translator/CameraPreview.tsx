@@ -1,13 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AlertCircle, Camera, CameraOff, Loader2, ShieldAlert } from 'lucide-react';
+import {
+  CameraLifecycleController,
+  CameraLifecycleStatus,
+  MinimalMediaStream,
+} from '../../utils/cameraLifecycle';
 
-export type CameraStatus =
-  | 'off'
-  | 'requesting'
-  | 'active'
-  | 'denied'
-  | 'unavailable'
-  | 'error';
+export type CameraStatus = CameraLifecycleStatus;
 
 interface CameraPreviewProps {
   resetSignal: number;
@@ -20,119 +19,101 @@ const STATUS_LABELS: Record<CameraStatus, string> = {
   active: 'Camera Active (Preview Only)',
   denied: 'Permission Denied',
   unavailable: 'Camera Unavailable',
+  disconnected: 'Camera Disconnected',
   error: 'Camera Error',
 };
 
 export function CameraPreview({ resetSignal, onStatusAnnouncement }: CameraPreviewProps) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const activeStreamRef = useRef<MinimalMediaStream | null>(null);
+  const controllerRef = useRef<CameraLifecycleController | null>(null);
+  const announcementRef = useRef(onStatusAnnouncement);
+
   const [status, setStatus] = useState<CameraStatus>('off');
   const [errorDetail, setErrorDetail] = useState<string>('');
 
-  const stopStream = useCallback((announce: boolean) => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-    if (videoRef.current) {
-      videoRef.current.srcObject = null;
-    }
-    setStatus('off');
-    setErrorDetail('');
-    if (announce) {
-      onStatusAnnouncement?.('Camera preview stopped.');
-    }
+  useEffect(() => {
+    announcementRef.current = onStatusAnnouncement;
   }, [onStatusAnnouncement]);
 
+  // Instantiate race-safe lifecycle controller once and dispose strictly on unmount
   useEffect(() => {
+    const controller = new CameraLifecycleController({
+      onStatusChange: (nextStatus, detail) => {
+        setStatus(nextStatus);
+        setErrorDetail(detail ?? '');
+      },
+      onStreamChange: (stream) => {
+        activeStreamRef.current = stream;
+        if (!stream && videoRef.current) {
+          videoRef.current.srcObject = null;
+        }
+      },
+      onAnnouncement: (message) => {
+        announcementRef.current?.(message);
+      },
+    });
+
+    controllerRef.current = controller;
+
+    // Release active camera tracks if the user navigates away or closes the page
+    const handlePageHide = () => {
+      controller.stop(false);
+    };
+    window.addEventListener('pagehide', handlePageHide);
+
     return () => {
-      if (streamRef.current) {
-        streamRef.current.getTracks().forEach((track) => track.stop());
-        streamRef.current = null;
+      window.removeEventListener('pagehide', handlePageHide);
+      controller.dispose();
+      controllerRef.current = null;
+      activeStreamRef.current = null;
+      if (videoRef.current) {
+        videoRef.current.srcObject = null;
       }
     };
   }, []);
 
+  // Stop camera and invalidate pending permission requests on Reset Workspace
   useEffect(() => {
     if (resetSignal > 0) {
-      stopStream(false);
+      controllerRef.current?.stop(false);
     }
-  }, [resetSignal, stopStream]);
+  }, [resetSignal]);
 
-  // Attach active MediaStream once the video element is mounted
+  // Attach active MediaStream once the video element mounts in the active view
   useEffect(() => {
-    if (status === 'active' && videoRef.current && streamRef.current) {
-      videoRef.current.srcObject = streamRef.current;
+    if (status === 'active' && videoRef.current && activeStreamRef.current) {
+      videoRef.current.srcObject = activeStreamRef.current as MediaStream;
       videoRef.current.play().catch(() => {
-        // Autoplay restriction handled silently; muted + playsInline allows playback
+        // Muted + playsInline allows playback; ignore benign autoplay rejections
       });
     }
   }, [status]);
 
-  const handleStartCamera = async () => {
-    if (status === 'requesting' || status === 'active') return;
+  const handleStartCamera = useCallback(() => {
+    const controller = controllerRef.current;
+    if (!controller) return;
 
-    if (
-      typeof navigator === 'undefined' ||
-      !navigator.mediaDevices ||
-      typeof navigator.mediaDevices.getUserMedia !== 'function'
-    ) {
-      setStatus('unavailable');
-      const msg =
-        'Your browser or current context does not expose camera media APIs. Ensure HTTPS or a supported browser to test the preview.';
-      setErrorDetail(msg);
-      onStatusAnnouncement?.('Camera unavailable in this browser.');
-      return;
-    }
+    const getUserMedia =
+      typeof navigator !== 'undefined' &&
+      navigator.mediaDevices &&
+      typeof navigator.mediaDevices.getUserMedia === 'function'
+        ? (constraints: MediaStreamConstraints) =>
+            navigator.mediaDevices.getUserMedia(constraints)
+        : null;
 
-    setStatus('requesting');
-    setErrorDetail('');
-    onStatusAnnouncement?.('Requesting browser camera permission.');
+    void controller.start(getUserMedia);
+  }, []);
 
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode: 'user',
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-        },
-        audio: false,
-      });
+  const handleStopCamera = useCallback(() => {
+    controllerRef.current?.stop(true);
+  }, []);
 
-      streamRef.current = stream;
-      setStatus('active');
-      onStatusAnnouncement?.(
-        'Camera preview is now active. Frames are displayed locally and not analysed in this prototype.',
-      );
-    } catch (err) {
-      const errorName = err instanceof DOMException ? err.name : '';
-      if (errorName === 'NotAllowedError' || errorName === 'PermissionDeniedError') {
-        setStatus('denied');
-        setErrorDetail(
-          'Camera permission was declined. Allow camera access in your browser site settings and try again, or continue using the manual ISL alphabet selector.',
-        );
-        onStatusAnnouncement?.('Camera permission denied.');
-      } else if (errorName === 'NotFoundError' || errorName === 'DevicesNotFoundError') {
-        setStatus('unavailable');
-        setErrorDetail(
-          'No camera device was detected on this machine. You can still test the full sign-to-text, clipboard, and speech workflow manually.',
-        );
-        onStatusAnnouncement?.('No camera device found.');
-      } else if (errorName === 'NotReadableError' || errorName === 'TrackStartError') {
-        setStatus('error');
-        setErrorDetail(
-          'The camera appears to be in use by another application. Close other video apps and retry.',
-        );
-        onStatusAnnouncement?.('Camera is currently busy.');
-      } else {
-        setStatus('error');
-        setErrorDetail(
-          'Unable to start camera preview in this environment. You can continue using manual ISL character selection below.',
-        );
-        onStatusAnnouncement?.('Unable to start camera preview.');
-      }
-    }
-  };
+  const isErrorLike =
+    status === 'denied' ||
+    status === 'unavailable' ||
+    status === 'disconnected' ||
+    status === 'error';
 
   return (
     <div className="rounded-xl border hairline-border bg-[var(--bg-surface)] overflow-hidden flex flex-col">
@@ -151,7 +132,7 @@ export function CameraPreview({ resetSignal, onStatusAnnouncement }: CameraPrevi
           data-testid="camera-permission-status"
           className="text-xs font-mono text-[var(--text-secondary)] flex items-center gap-1.5"
         >
-          {status === 'denied' || status === 'unavailable' || status === 'error' ? (
+          {isErrorLike ? (
             <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" aria-hidden="true" />
           ) : null}
           <span>{STATUS_LABELS[status]}</span>
@@ -170,7 +151,6 @@ export function CameraPreview({ resetSignal, onStatusAnnouncement }: CameraPrevi
               aria-label="Live local camera preview"
               className="w-full h-full object-cover scale-x-[-1]"
             />
-            {/* Minimalist framing corners (no fake bounding boxes or fake confidence readouts) */}
             <div
               aria-hidden="true"
               className="pointer-events-none absolute inset-5 border border-[var(--accent-primary)]/35 rounded-lg"
@@ -193,12 +173,9 @@ export function CameraPreview({ resetSignal, onStatusAnnouncement }: CameraPrevi
               Respond to your browser’s permission prompt to preview your local camera feed.
             </p>
           </div>
-        ) : status === 'denied' || status === 'unavailable' || status === 'error' ? (
+        ) : isErrorLike ? (
           <div className="px-6 py-8 text-center max-w-md" role="alert">
-            <ShieldAlert
-              className="w-8 h-8 mx-auto text-amber-500"
-              aria-hidden="true"
-            />
+            <ShieldAlert className="w-8 h-8 mx-auto text-amber-500" aria-hidden="true" />
             <p className="mt-3 text-sm font-semibold text-[var(--text-primary)]">
               {STATUS_LABELS[status]}
             </p>
@@ -238,7 +215,7 @@ export function CameraPreview({ resetSignal, onStatusAnnouncement }: CameraPrevi
 
           <button
             type="button"
-            onClick={() => stopStream(true)}
+            onClick={handleStopCamera}
             disabled={status !== 'active' && status !== 'requesting'}
             className="inline-flex items-center justify-center gap-2 min-h-[42px] px-4 py-2 rounded-md border hairline-border-strong bg-[var(--bg-surface)] text-[var(--text-primary)] text-sm font-medium hover:border-[var(--accent-primary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer whitespace-nowrap shrink-0"
           >
@@ -247,9 +224,7 @@ export function CameraPreview({ resetSignal, onStatusAnnouncement }: CameraPrevi
           </button>
         </div>
 
-        <span className="text-xs text-[var(--text-muted)]">
-          User-initiated permission only
-        </span>
+        <span className="text-xs text-[var(--text-muted)]">User-initiated permission only</span>
       </div>
     </div>
   );

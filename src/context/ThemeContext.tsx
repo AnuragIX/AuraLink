@@ -69,9 +69,22 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     };
     motionQuery.addEventListener('change', handleMotionChange);
 
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== THEME_STORAGE_KEY) return;
+      if (isValidTheme(event.newValue)) {
+        setThemeState(event.newValue);
+        setHasExplicitPreference(true);
+      } else if (event.newValue === null) {
+        setHasExplicitPreference(false);
+        setThemeState(getSystemPrefersDark() ? 'dark' : 'light');
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+
     return () => {
       colorSchemeQuery.removeEventListener('change', handleColorSchemeChange);
       motionQuery.removeEventListener('change', handleMotionChange);
+      window.removeEventListener('storage', handleStorage);
     };
   }, [hasExplicitPreference]);
 

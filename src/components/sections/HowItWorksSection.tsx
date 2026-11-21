@@ -263,6 +263,26 @@ export function HowItWorksSection() {
   const { reducedMotion } = useTheme();
   const activeStage = STAGES[activeIndex];
 
+  const handleTabKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>, index: number) => {
+    let nextIndex: number | null = null;
+    if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
+      nextIndex = (index + 1) % STAGES.length;
+    } else if (event.key === 'ArrowUp' || event.key === 'ArrowLeft') {
+      nextIndex = (index - 1 + STAGES.length) % STAGES.length;
+    } else if (event.key === 'Home') {
+      nextIndex = 0;
+    } else if (event.key === 'End') {
+      nextIndex = STAGES.length - 1;
+    }
+
+    if (nextIndex !== null) {
+      event.preventDefault();
+      setActiveIndex(nextIndex);
+      const nextButton = document.getElementById(`stage-tab-${STAGES[nextIndex].id}`);
+      nextButton?.focus();
+    }
+  };
+
   const getIcon = (id: WorkflowStage['id']) => {
     if (id === 'capture') return <Camera className="w-4 h-4" aria-hidden="true" />;
     if (id === 'recognise') return <Cpu className="w-4 h-4" aria-hidden="true" />;
@@ -305,9 +325,11 @@ export function HowItWorksSection() {
                   type="button"
                   role="tab"
                   id={`stage-tab-${stage.id}`}
+                  tabIndex={isSelected ? 0 : -1}
                   aria-selected={isSelected}
                   aria-controls={`stage-panel-${stage.id}`}
                   onClick={() => setActiveIndex(index)}
+                  onKeyDown={(e) => handleTabKeyDown(e, index)}
                   className={`text-left p-5 sm:p-6 rounded-xl border transition-colors cursor-pointer ${
                     isSelected
                       ? 'bg-[var(--bg-surface)] border-[var(--accent-primary)]'

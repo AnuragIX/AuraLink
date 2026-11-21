@@ -39,6 +39,8 @@ export function TranslatorWorkspace() {
   const [speechMessage, setSpeechMessage] = useState<string>('');
   const [liveAnnouncement, setLiveAnnouncement] = useState<string>('');
   const copyTimerRef = useRef<number | null>(null);
+  const speechTimerRef = useRef<number | null>(null);
+  const speechSessionRef = useRef<number>(0);
 
   const selectedSpec = getIslLetterSpec(state.selectedLetter);
   const trimmedOutput = state.outputText.trim();
@@ -46,6 +48,13 @@ export function TranslatorWorkspace() {
 
   const announce = useCallback((message: string) => {
     setLiveAnnouncement(message);
+  }, []);
+
+  const clearSpeechTimer = useCallback(() => {
+    if (speechTimerRef.current !== null) {
+      window.clearTimeout(speechTimerRef.current);
+      speechTimerRef.current = null;
+    }
   }, []);
 
   useEffect(() => {
@@ -56,14 +65,17 @@ export function TranslatorWorkspace() {
 
   useEffect(() => {
     return () => {
-      if (copyTimerRef.current) {
+      speechSessionRef.current += 1;
+      if (copyTimerRef.current !== null) {
         window.clearTimeout(copyTimerRef.current);
+        copyTimerRef.current = null;
       }
+      clearSpeechTimer();
       if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         window.speechSynthesis.cancel();
       }
     };
-  }, []);
+  }, [clearSpeechTimer]);
 
   const handleCopyText = async (textToCopy: string, targetId: string) => {
     const clean = textToCopy.trim();
@@ -117,6 +129,8 @@ export function TranslatorWorkspace() {
     const clean = textToSpeak.trim();
     if (!clean) return;
 
+    clearSpeechTimer();
+
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
       setSpeechState('unsupported');
       setSpeechMessage('Browser text-to-speech is not supported in this environment.');
@@ -126,6 +140,7 @@ export function TranslatorWorkspace() {
 
     try {
       if (speechState === 'speaking') {
+        speechSessionRef.current += 1;
         window.speechSynthesis.cancel();
         setSpeechState('idle');
         setSpeechMessage('Speech playback stopped.');
@@ -133,20 +148,26 @@ export function TranslatorWorkspace() {
         return;
       }
 
+      const sessionId = ++speechSessionRef.current;
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(clean);
       utterance.lang = 'en-IN';
       utterance.rate = 0.96;
 
       utterance.onstart = () => {
+        if (sessionId !== speechSessionRef.current) return;
         setSpeechState('speaking');
         setSpeechMessage(`Speaking "${clean}" via browser speech synthesis.`);
       };
       utterance.onend = () => {
+        if (sessionId !== speechSessionRef.current) return;
+        clearSpeechTimer();
         setSpeechState('idle');
         setSpeechMessage('Speech demonstration completed.');
       };
       utterance.onerror = () => {
+        if (sessionId !== speechSessionRef.current) return;
+        clearSpeechTimer();
         setSpeechState('error');
         setSpeechMessage(
           'Browser speech playback could not start (no system voice available or audio restricted).',
@@ -159,7 +180,9 @@ export function TranslatorWorkspace() {
       window.speechSynthesis.speak(utterance);
 
       // Guard for headless environments where onend/onerror may not fire without audio hardware
-      window.setTimeout(() => {
+      speechTimerRef.current = window.setTimeout(() => {
+        speechTimerRef.current = null;
+        if (sessionId !== speechSessionRef.current) return;
         if (!window.speechSynthesis.speaking && !window.speechSynthesis.pending) {
           setSpeechState((current) => (current === 'speaking' ? 'idle' : current));
         }
@@ -173,7 +196,10 @@ export function TranslatorWorkspace() {
 
   const handleSaveToHistory = () => {
     if (!trimmedOutput) return;
-    const id = `hist-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    const id =
+      typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+        ? crypto.randomUUID()
+        : `hist-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
     dispatch({
       type: 'COMMIT_TO_HISTORY',
       id,
@@ -182,6 +208,12 @@ export function TranslatorWorkspace() {
   };
 
   const handleResetWorkspace = () => {
+    speechSessionRef.current += 1;
+    clearSpeechTimer();
+    if (copyTimerRef.current !== null) {
+      window.clearTimeout(copyTimerRef.current);
+      copyTimerRef.current = null;
+    }
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       window.speechSynthesis.cancel();
     }
