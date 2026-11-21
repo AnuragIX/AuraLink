@@ -11,6 +11,10 @@ updates:
         update-types:
           - "minor"
           - "patch"
+    ignore:
+      # Keep @types/node aligned with the CI and runtime Node.js 22 LTS version
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: "github-actions"
     directory: "/"
