@@ -1,0 +1,10 @@
+{
+  "name": "AuraLink AI",
+  "description": "Beyond Words. Beyond Barriers. An AI-powered accessibility and Indian Sign Language communication platform and interactive translator prototype.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

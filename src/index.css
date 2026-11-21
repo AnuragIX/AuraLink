@@ -1,0 +1,107 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-display: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+:root {
+  --bg-canvas: #f6f8fc;
+  --bg-surface: #ffffff;
+  --bg-surface-subtle: #ebf0f7;
+  --bg-surface-elevated: #ffffff;
+  --border-hairline: rgba(12, 26, 54, 0.11);
+  --border-strong: rgba(12, 26, 54, 0.22);
+  --text-primary: #091328;
+  --text-secondary: #43536e;
+  --text-muted: #5d6e8a;
+  --accent-primary: #0284c7;
+  --accent-primary-hover: #0369a1;
+  --accent-cyan: #0891b2;
+  --accent-glow: rgba(2, 132, 199, 0.14);
+  --accent-contrast-text: #ffffff;
+}
+
+.dark {
+  --bg-canvas: #040814;
+  --bg-surface: #0a1124;
+  --bg-surface-subtle: #0f1a33;
+  --bg-surface-elevated: #13203d;
+  --border-hairline: rgba(148, 184, 232, 0.14);
+  --border-strong: rgba(148, 184, 232, 0.28);
+  --text-primary: #f1f6fc;
+  --text-secondary: #a2b4d0;
+  --text-muted: #788dae;
+  --accent-primary: #22d3ee;
+  --accent-primary-hover: #06b6d4;
+  --accent-cyan: #38bdf8;
+  --accent-glow: rgba(34, 211, 238, 0.16);
+  --accent-contrast-text: #04101f;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: var(--bg-canvas);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: clip;
+    transition: background-color 220ms cubic-bezier(0.16, 1, 0.3, 1),
+      color 220ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  .dark body {
+    letter-spacing: 0.005em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+  }
+}
+
+/* Spatial architectural grid backdrop */
+.spatial-grid-bg {
+  background-image:
+    linear-gradient(to right, var(--border-hairline) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--border-hairline) 1px, transparent 1px);
+  background-size: 64px 64px;
+}
+
+/* Subtle horizontal hairline rule */
+.hairline-border {
+  border-color: var(--border-hairline);
+}
+
+.hairline-border-strong {
+  border-color: var(--border-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
