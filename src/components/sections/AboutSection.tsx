@@ -1,24 +1,51 @@
 import React from 'react';
-import { Reveal, SectionHeader } from '../ui/MotionPrimitives';
+import { motion } from 'motion/react';
+import { useTheme } from '../../context/ThemeContext';
+import { EASE_SIGNAL, Reveal, SectionHeader } from '../ui/MotionPrimitives';
+
+const DESIGN_COMMITMENTS = [
+  {
+    number: '01',
+    accentClass: 'text-[var(--accent-coral-text)]',
+    title: 'Dignity First',
+    body: 'Built as a mutual communication tool, never framing signers as passive recipients.',
+  },
+  {
+    number: '02',
+    accentClass: 'text-[var(--accent-ink)]',
+    title: 'ISL Specificity',
+    body: 'Respects Indian Sign Language conventions—including two-handed manual forms—rather than reusing ASL assumptions.',
+  },
+  {
+    number: '03',
+    accentClass: 'text-[var(--accent-mint-text)]',
+    title: 'Clear Boundaries',
+    body: 'Explicitly separates working interface prototypes from planned machine learning capabilities.',
+  },
+] as const;
 
 export function AboutSection() {
+  const { reducedMotion } = useTheme();
+
   return (
     <section
       id="about"
       aria-labelledby="about-heading"
-      className="py-20 sm:py-24 lg:py-32 border-t hairline-border"
+      className="py-20 sm:py-28 lg:py-32 border-t hairline-border bg-[var(--bg-canvas)]"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Asymmetric Editorial Spread */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-14 items-start">
-          {/* Editorial Narrative Column */}
-          <Reveal className="lg:col-span-6">
+          {/* Narrative Column (5 cols) */}
+          <Reveal className="lg:col-span-5">
             <SectionHeader
+              index="01"
               headingId="about-heading"
-              kicker="About AuraLink AI"
+              kicker="Mission & Purpose"
               title="Closing everyday friction between visual language and digital interfaces."
             />
 
-            <div className="mt-8 space-y-5 text-base leading-relaxed text-[var(--text-secondary)] max-w-2xl">
+            <div className="mt-8 space-y-5 text-base leading-[1.72] text-[var(--text-secondary)]">
               <p>
                 Indian Sign Language is a rich, complete visual-spatial language used across India,
                 yet most everyday digital systems—public kiosks, classrooms, clinics, and workplace
@@ -39,245 +66,262 @@ export function AboutSection() {
             </div>
           </Reveal>
 
-          {/* Architectural Editorial Visual Diagram */}
-          <Reveal delay={0.1} className="lg:col-span-6">
-            <div className="rounded-xl border hairline-border bg-[var(--bg-surface)] p-6 sm:p-8">
-              <div className="flex items-center justify-between pb-5 border-b hairline-border">
-                <h3 className="font-display text-base font-semibold text-[var(--text-primary)]">
-                  The Communication Gap & Design Response
+          {/* Sculptural Architecture Composition (7 cols) */}
+          <Reveal delay={0.12} className="lg:col-span-7">
+            <div className="rounded-xl border hairline-border bg-[var(--bg-surface)] overflow-hidden">
+              <div className="px-6 py-4 border-b hairline-border flex flex-wrap items-center justify-between gap-2">
+                <h3 className="font-display text-sm sm:text-base font-semibold text-[var(--text-primary)]">
+                  The Communication Gap &amp; Design Response
                 </h3>
-                <span className="font-mono text-xs text-[var(--text-muted)]">Architecture View</span>
+                <span className="font-mono text-xs text-[var(--text-muted)]">
+                  Human Signal Architecture
+                </span>
               </div>
 
-              {/* Custom Spatial Communication Flow SVG */}
-              <div className="py-7">
+              {/* Expressive Geometric Signal Flow Diagram */}
+              <div className="px-4 sm:px-8 py-8 sm:py-10 bg-[var(--bg-surface)]">
                 <svg
-                  viewBox="0 0 520 210"
+                  viewBox="0 0 560 236"
                   role="img"
                   aria-label="Diagram illustrating how Indian Sign Language visual expression connects through AuraLink AI to readable text and speech output"
                   className="w-full h-auto"
                 >
-                  {/* Subtle coordinate lines */}
+                  {/* Baseline coordinate axis */}
                   <line
-                    x1="24"
-                    y1="105"
-                    x2="496"
-                    y2="105"
-                    stroke="currentColor"
-                    strokeOpacity="0.12"
-                    strokeDasharray="3 5"
+                    x1="28"
+                    y1="108"
+                    x2="532"
+                    y2="108"
+                    stroke="var(--border-strong)"
+                    strokeDasharray="3 6"
+                    strokeWidth="1"
                   />
 
-                  {/* Node 1: ISL Signer */}
-                  <g transform="translate(82, 105)">
+                  {/* Node 1: Visual Expression (Human Coral) */}
+                  <g transform="translate(92, 108)">
                     <circle
-                      r="52"
+                      r="56"
                       fill="var(--bg-surface-subtle)"
                       stroke="var(--border-strong)"
                       strokeWidth="1.2"
                     />
                     <circle
-                      r="36"
+                      r="39"
                       fill="none"
-                      stroke="var(--accent-primary)"
-                      strokeOpacity="0.45"
-                      strokeWidth="1.2"
+                      stroke="var(--accent-coral)"
+                      strokeOpacity="0.6"
+                      strokeWidth="1.4"
                     />
-                    <circle cx="-10" cy="-8" r="3" fill="var(--accent-primary)" />
-                    <circle cx="8" cy="-14" r="3" fill="var(--accent-primary)" />
-                    <circle cx="15" cy="2" r="3" fill="var(--accent-primary)" />
-                    <circle cx="2" cy="14" r="3" fill="var(--accent-primary)" />
-                    <circle cx="-14" cy="9" r="3" fill="var(--accent-primary)" />
+                    <circle cx="-13" cy="-10" r="3.6" fill="var(--accent-coral)" />
+                    <circle cx="9" cy="-16" r="3.6" fill="var(--accent-coral)" />
+                    <circle cx="17" cy="4" r="3.6" fill="var(--accent-coral)" />
+                    <circle cx="2" cy="17" r="3.6" fill="var(--accent-coral)" />
+                    <circle cx="-16" cy="11" r="3.6" fill="var(--accent-coral)" />
                     <path
-                      d="M-10 -8 L8 -14 L15 2 L2 14 L-14 9 Z"
+                      d="M-13 -10 L9 -16 L17 4 L2 17 L-16 11 Z"
                       fill="none"
-                      stroke="var(--accent-primary)"
-                      strokeWidth="1.2"
-                      strokeOpacity="0.7"
+                      stroke="var(--accent-coral)"
+                      strokeWidth="1.4"
+                      strokeOpacity="0.78"
                     />
                   </g>
                   <text
-                    x="82"
-                    y="182"
+                    x="92"
+                    y="194"
                     textAnchor="middle"
                     fill="var(--text-primary)"
-                    fontSize="12"
+                    fontSize="12.5"
                     fontWeight="600"
-                    fontFamily="Plus Jakarta Sans, sans-serif"
+                    fontFamily="Space Grotesk, sans-serif"
                   >
                     Visual Expression
                   </text>
                   <text
-                    x="82"
-                    y="198"
+                    x="92"
+                    y="212"
                     textAnchor="middle"
                     fill="var(--text-muted)"
                     fontSize="10.5"
-                    fontFamily="DM Sans, sans-serif"
+                    fontFamily="IBM Plex Mono, monospace"
                   >
-                    ISL Hand Signs
+                    ISL Signer Input
                   </text>
 
-                  {/* Connecting Arcs */}
-                  <path
-                    d="M138 92 C185 52, 205 52, 232 92"
+                  {/* Signal Paths 1 -> 2 */}
+                  <motion.path
+                    d="M152 92 C196 48, 218 48, 240 92"
+                    fill="none"
+                    stroke="var(--accent-coral)"
+                    strokeWidth="1.8"
+                    initial={reducedMotion ? false : { pathLength: 0, opacity: 0.3 }}
+                    whileInView={{ pathLength: 1, opacity: 0.9 }}
+                    viewport={{ once: true, amount: 0.4 }}
+                    transition={{ duration: 0.85, ease: EASE_SIGNAL }}
+                  />
+                  <motion.path
+                    d="M152 124 C196 168, 218 168, 240 124"
                     fill="none"
                     stroke="var(--accent-primary)"
-                    strokeWidth="1.6"
-                    strokeOpacity="0.85"
-                  />
-                  <path
-                    d="M138 118 C185 158, 205 158, 232 118"
-                    fill="none"
-                    stroke="var(--accent-cyan)"
-                    strokeWidth="1.2"
-                    strokeOpacity="0.5"
+                    strokeWidth="1.5"
+                    initial={reducedMotion ? false : { pathLength: 0, opacity: 0.25 }}
+                    whileInView={{ pathLength: 1, opacity: 0.72 }}
+                    viewport={{ once: true, amount: 0.4 }}
+                    transition={{ duration: 0.85, delay: 0.12, ease: EASE_SIGNAL }}
                   />
 
-                  {/* Node 2: AuraLink Core */}
-                  <g transform="translate(260, 105)">
+                  {/* Node 2: AuraLink Core (Signal Blue) */}
+                  <g transform="translate(280, 108)">
                     <polygon
-                      points="0,-46 40,-23 40,23 0,46 -40,23 -40,-23"
-                      fill="var(--bg-surface-subtle)"
+                      points="0,-52 45,-26 45,26 0,52 -45,26 -45,-26"
+                      fill="var(--bg-contrast)"
                       stroke="var(--accent-primary)"
-                      strokeWidth="1.5"
+                      strokeWidth="2"
                     />
-                    <circle r="10" fill="var(--accent-primary)" fillOpacity="0.2" />
-                    <circle r="4" fill="var(--accent-primary)" />
+                    <polygon
+                      points="0,-30 26,-15 26,15 0,30 -26,15 -26,-15"
+                      fill="none"
+                      stroke="var(--accent-mint)"
+                      strokeOpacity="0.48"
+                      strokeWidth="1.1"
+                    />
+                    <circle r="11" fill="var(--accent-primary)" fillOpacity="0.28" />
+                    <circle r="4.5" fill="#ffffff" />
                   </g>
                   <text
-                    x="260"
-                    y="182"
+                    x="280"
+                    y="194"
                     textAnchor="middle"
                     fill="var(--text-primary)"
-                    fontSize="12"
+                    fontSize="12.5"
                     fontWeight="600"
-                    fontFamily="Plus Jakarta Sans, sans-serif"
+                    fontFamily="Space Grotesk, sans-serif"
                   >
                     AuraLink Interface
                   </text>
                   <text
-                    x="260"
-                    y="198"
+                    x="280"
+                    y="212"
                     textAnchor="middle"
                     fill="var(--text-muted)"
                     fontSize="10.5"
-                    fontFamily="DM Sans, sans-serif"
+                    fontFamily="IBM Plex Mono, monospace"
                   >
                     Recognition Roadmap
                   </text>
 
-                  {/* Outgoing Arcs */}
-                  <path
-                    d="M288 92 C335 52, 355 52, 382 92"
+                  {/* Signal Paths 2 -> 3 */}
+                  <motion.path
+                    d="M320 92 C342 48, 364 48, 408 92"
                     fill="none"
                     stroke="var(--accent-primary)"
-                    strokeWidth="1.6"
-                    strokeOpacity="0.85"
+                    strokeWidth="1.8"
+                    initial={reducedMotion ? false : { pathLength: 0, opacity: 0.3 }}
+                    whileInView={{ pathLength: 1, opacity: 0.9 }}
+                    viewport={{ once: true, amount: 0.4 }}
+                    transition={{ duration: 0.85, delay: 0.2, ease: EASE_SIGNAL }}
                   />
-                  <path
-                    d="M288 118 C335 158, 355 158, 382 118"
+                  <motion.path
+                    d="M320 124 C342 168, 364 168, 408 124"
                     fill="none"
-                    stroke="var(--accent-cyan)"
-                    strokeWidth="1.2"
-                    strokeOpacity="0.5"
+                    stroke="var(--accent-mint-text)"
+                    strokeWidth="1.5"
+                    initial={reducedMotion ? false : { pathLength: 0, opacity: 0.25 }}
+                    whileInView={{ pathLength: 1, opacity: 0.78 }}
+                    viewport={{ once: true, amount: 0.4 }}
+                    transition={{ duration: 0.85, delay: 0.3, ease: EASE_SIGNAL }}
                   />
 
-                  {/* Node 3: Accessible Output */}
-                  <g transform="translate(438, 105)">
+                  {/* Node 3: Accessible Output (Soft Mint) */}
+                  <g transform="translate(468, 108)">
                     <rect
-                      x="-48"
-                      y="-38"
-                      width="96"
-                      height="76"
-                      rx="8"
+                      x="-52"
+                      y="-42"
+                      width="104"
+                      height="84"
+                      rx="10"
                       fill="var(--bg-surface-subtle)"
                       stroke="var(--border-strong)"
                       strokeWidth="1.2"
                     />
                     <line
-                      x1="-28"
-                      y1="-14"
-                      x2="26"
-                      y2="-14"
+                      x1="-30"
+                      y1="-16"
+                      x2="28"
+                      y2="-16"
                       stroke="var(--text-primary)"
-                      strokeWidth="2.2"
+                      strokeWidth="2.4"
                       strokeLinecap="round"
                     />
                     <line
-                      x1="-28"
-                      y1="0"
+                      x1="-30"
+                      y1="-1"
                       x2="14"
-                      y2="0"
+                      y2="-1"
                       stroke="var(--accent-primary)"
-                      strokeWidth="2.2"
+                      strokeWidth="2.4"
                       strokeLinecap="round"
                     />
                     <path
-                      d="M-28 16 Q-18 8 -8 16 T12 16 T28 16"
+                      d="M-30 18 Q-19 8 -8 18 T14 18 T30 18"
                       fill="none"
-                      stroke="var(--accent-cyan)"
-                      strokeWidth="1.8"
+                      stroke="var(--accent-mint-text)"
+                      strokeWidth="2.1"
                       strokeLinecap="round"
                     />
                   </g>
                   <text
-                    x="438"
-                    y="182"
+                    x="468"
+                    y="194"
                     textAnchor="middle"
                     fill="var(--text-primary)"
-                    fontSize="12"
+                    fontSize="12.5"
                     fontWeight="600"
-                    fontFamily="Plus Jakarta Sans, sans-serif"
+                    fontFamily="Space Grotesk, sans-serif"
                   >
-                    Text & Speech
+                    Text &amp; Speech
                   </text>
                   <text
-                    x="438"
-                    y="198"
+                    x="468"
+                    y="212"
                     textAnchor="middle"
                     fill="var(--text-muted)"
                     fontSize="10.5"
-                    fontFamily="DM Sans, sans-serif"
+                    fontFamily="IBM Plex Mono, monospace"
                   >
                     Shared Understanding
                   </text>
                 </svg>
               </div>
 
-              {/* Three Quiet Design Commitments */}
-              <div className="pt-5 border-t hairline-border grid grid-cols-1 sm:grid-cols-3 gap-5">
-                <div>
-                  <p className="text-xs font-mono text-[var(--accent-cyan)]">Principle 01</p>
-                  <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
-                    Dignity First
-                  </p>
-                  <p className="mt-1 text-xs leading-relaxed text-[var(--text-secondary)]">
-                    Built as a mutual communication tool, never framing signers as passive recipients.
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-mono text-[var(--accent-cyan)]">Principle 02</p>
-                  <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
-                    ISL Specificity
-                  </p>
-                  <p className="mt-1 text-xs leading-relaxed text-[var(--text-secondary)]">
-                    Respects Indian Sign Language conventions rather than reusing ASL assumptions.
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs font-mono text-[var(--accent-cyan)]">Principle 03</p>
-                  <p className="mt-1 text-sm font-semibold text-[var(--text-primary)]">
-                    Clear Boundaries
-                  </p>
-                  <p className="mt-1 text-xs leading-relaxed text-[var(--text-secondary)]">
-                    Explicitly separates working interface prototypes from planned ML capabilities.
-                  </p>
-                </div>
+              {/* Editorial Summary Footnote */}
+              <div className="px-6 py-4 border-t hairline-border bg-[var(--bg-surface-subtle)]/55 flex flex-wrap items-center justify-between gap-2 text-xs text-[var(--text-secondary)]">
+                <span>Human-centred communication bridge built around ISL ergonomics.</span>
+                <span className="font-mono text-[var(--text-muted)]">
+                  Prototype UI Live · Vision Model Planned
+                </span>
               </div>
             </div>
           </Reveal>
         </div>
+
+        {/* Full-Width Hairline-Ruled Design Commitments (Zero Box-in-Box Clutter) */}
+        <Reveal delay={0.18} className="mt-16 lg:mt-20 pt-10 border-t hairline-border">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+            {DESIGN_COMMITMENTS.map((item) => (
+              <div key={item.number} className="flex flex-col">
+                <p className={`font-mono text-xs font-medium tabular-nums ${item.accentClass}`}>
+                  Principle {item.number}
+                </p>
+                <h3 className="mt-2 font-display text-xl font-bold tracking-[-0.02em] text-[var(--text-primary)]">
+                  {item.title}
+                </h3>
+                <p className="mt-2.5 text-sm sm:text-[15px] leading-relaxed text-[var(--text-secondary)]">
+                  {item.body}
+                </p>
+              </div>
+            ))}
+          </div>
+        </Reveal>
       </div>
     </section>
   );

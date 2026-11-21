@@ -1,10 +1,20 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { AlertCircle, Camera, CameraOff, Loader2, ShieldAlert } from 'lucide-react';
+import {
+  AlertCircle,
+  Camera,
+  CameraOff,
+  CheckCircle2,
+  Loader2,
+  ShieldAlert,
+} from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
+import { useTheme } from '../../context/ThemeContext';
 import {
   CameraLifecycleController,
   CameraLifecycleStatus,
   MinimalMediaStream,
 } from '../../utils/cameraLifecycle';
+import { EASE_SIGNAL } from '../ui/MotionPrimitives';
 
 export type CameraStatus = CameraLifecycleStatus;
 
@@ -24,6 +34,7 @@ const STATUS_LABELS: Record<CameraStatus, string> = {
 };
 
 export function CameraPreview({ resetSignal, onStatusAnnouncement }: CameraPreviewProps) {
+  const { reducedMotion } = useTheme();
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const activeStreamRef = useRef<MinimalMediaStream | null>(null);
   const controllerRef = useRef<CameraLifecycleController | null>(null);
@@ -117,10 +128,10 @@ export function CameraPreview({ resetSignal, onStatusAnnouncement }: CameraPrevi
 
   return (
     <div className="rounded-xl border hairline-border bg-[var(--bg-surface)] overflow-hidden flex flex-col">
-      {/* Camera Panel Header */}
-      <div className="px-5 py-3.5 border-b hairline-border flex flex-wrap items-center justify-between gap-3">
+      {/* Studio Camera Panel Header */}
+      <div className="px-5 py-4 border-b hairline-border flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="font-display text-sm font-semibold text-[var(--text-primary)]">
+          <h3 className="font-display text-sm sm:text-base font-semibold text-[var(--text-primary)]">
             Camera Preview
           </h3>
           <p className="text-xs text-[var(--text-muted)]">
@@ -130,101 +141,186 @@ export function CameraPreview({ resetSignal, onStatusAnnouncement }: CameraPrevi
 
         <div
           data-testid="camera-permission-status"
-          className="text-xs font-mono text-[var(--text-secondary)] flex items-center gap-1.5"
+          className={`text-xs font-mono flex items-center gap-1.5 ${
+            status === 'active'
+              ? 'text-[var(--status-success)]'
+              : isErrorLike
+                ? 'text-[var(--status-warning)]'
+                : 'text-[var(--text-secondary)]'
+          }`}
         >
-          {isErrorLike ? (
-            <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0" aria-hidden="true" />
-          ) : null}
+          {status === 'active' ? (
+            <CheckCircle2 className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+          ) : status === 'requesting' ? (
+            <Loader2 className="w-3.5 h-3.5 animate-spin shrink-0" aria-hidden="true" />
+          ) : isErrorLike ? (
+            <AlertCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+          ) : (
+            <CameraOff className="w-3.5 h-3.5 text-[var(--text-muted)] shrink-0" aria-hidden="true" />
+          )}
           <span>{STATUS_LABELS[status]}</span>
         </div>
       </div>
 
-      {/* Viewport Frame */}
-      <div className="relative aspect-[16/10] sm:aspect-video w-full bg-[var(--bg-surface-subtle)] flex items-center justify-center overflow-hidden">
-        {status === 'active' ? (
-          <>
-            <video
-              ref={videoRef}
-              autoPlay
-              playsInline
-              muted
-              aria-label="Live local camera preview"
-              className="w-full h-full object-cover scale-x-[-1]"
-            />
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-5 border border-[var(--accent-primary)]/35 rounded-lg"
-            />
-            <div className="absolute bottom-3 left-3 right-3 px-3 py-2 rounded-md bg-slate-950/75 text-slate-100 text-xs flex flex-wrap items-center justify-between gap-2 backdrop-blur-sm">
-              <span>Local camera preview active</span>
-              <span className="font-mono text-cyan-300">Preview Only · Recognition Coming Soon</span>
-            </div>
-          </>
-        ) : status === 'requesting' ? (
-          <div className="px-6 py-8 text-center max-w-sm">
-            <Loader2
-              className="w-8 h-8 mx-auto text-[var(--accent-primary)] animate-spin"
-              aria-hidden="true"
-            />
-            <p className="mt-3 text-sm font-semibold text-[var(--text-primary)]">
-              Waiting for camera permission
-            </p>
-            <p className="mt-1.5 text-xs leading-relaxed text-[var(--text-secondary)]">
-              Respond to your browser’s permission prompt to preview your local camera feed.
-            </p>
-          </div>
-        ) : isErrorLike ? (
-          <div className="px-6 py-8 text-center max-w-md" role="alert">
-            <ShieldAlert className="w-8 h-8 mx-auto text-amber-500" aria-hidden="true" />
-            <p className="mt-3 text-sm font-semibold text-[var(--text-primary)]">
-              {STATUS_LABELS[status]}
-            </p>
-            <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-[var(--text-secondary)]">
-              {errorDetail}
-            </p>
-          </div>
-        ) : (
-          <div className="px-6 py-8 text-center max-w-md">
-            <div className="w-12 h-12 mx-auto rounded-lg border hairline-border bg-[var(--bg-surface)] flex items-center justify-center text-[var(--text-muted)]">
-              <CameraOff className="w-5 h-5" aria-hidden="true" />
-            </div>
-            <p className="mt-3.5 text-sm font-semibold text-[var(--text-primary)]">
-              Camera is currently off
-            </p>
-            <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-[var(--text-secondary)]">
-              Select <span className="font-medium text-[var(--text-primary)]">Start Camera</span> to
-              test your device’s live preview. Camera frames remain strictly local and are not
-              analysed in this prototype.
-            </p>
-          </div>
-        )}
+      {/* Studio Optical Viewport Frame */}
+      <div className="relative aspect-[16/10] sm:aspect-video w-full bg-[var(--bg-contrast)] text-[var(--text-on-contrast)] flex items-center justify-center overflow-hidden">
+        {/* Subtle Optical Framing Corner Brackets */}
+        <div aria-hidden="true" className="pointer-events-none absolute inset-4 z-10">
+          <span
+            className={`absolute top-0 left-0 w-5 h-5 border-t-2 border-l-2 transition-colors duration-200 ${
+              status === 'active'
+                ? 'border-[var(--accent-mint)]'
+                : isErrorLike
+                  ? 'border-[var(--accent-coral)]'
+                  : 'border-[var(--border-on-contrast-strong)]'
+            }`}
+          />
+          <span
+            className={`absolute top-0 right-0 w-5 h-5 border-t-2 border-r-2 transition-colors duration-200 ${
+              status === 'active'
+                ? 'border-[var(--accent-mint)]'
+                : isErrorLike
+                  ? 'border-[var(--accent-coral)]'
+                  : 'border-[var(--border-on-contrast-strong)]'
+            }`}
+          />
+          <span
+            className={`absolute bottom-0 left-0 w-5 h-5 border-b-2 border-l-2 transition-colors duration-200 ${
+              status === 'active'
+                ? 'border-[var(--accent-mint)]'
+                : isErrorLike
+                  ? 'border-[var(--accent-coral)]'
+                  : 'border-[var(--border-on-contrast-strong)]'
+            }`}
+          />
+          <span
+            className={`absolute bottom-0 right-0 w-5 h-5 border-b-2 border-r-2 transition-colors duration-200 ${
+              status === 'active'
+                ? 'border-[var(--accent-mint)]'
+                : isErrorLike
+                  ? 'border-[var(--accent-coral)]'
+                  : 'border-[var(--border-on-contrast-strong)]'
+            }`}
+          />
+        </div>
+
+        <AnimatePresence mode="wait">
+          {status === 'active' ? (
+            <motion.div
+              key="active"
+              initial={reducedMotion ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={reducedMotion ? undefined : { opacity: 0 }}
+              transition={{ duration: 0.22, ease: EASE_SIGNAL }}
+              className="relative w-full h-full"
+            >
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                aria-label="Live local camera preview"
+                className="w-full h-full object-cover scale-x-[-1]"
+              />
+              <div className="absolute bottom-3 left-3 right-3 z-20 px-3.5 py-2 rounded-md bg-[var(--bg-contrast)]/88 border contrast-border text-[var(--text-on-contrast)] text-xs flex flex-wrap items-center justify-between gap-2 backdrop-blur-sm">
+                <span className="font-medium">Local camera preview active</span>
+                <span className="font-mono text-[var(--accent-mint)]">
+                  Preview Only · Recognition Coming Soon
+                </span>
+              </div>
+            </motion.div>
+          ) : status === 'requesting' ? (
+            <motion.div
+              key="requesting"
+              initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reducedMotion ? undefined : { opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: EASE_SIGNAL }}
+              className="px-6 py-8 text-center max-w-sm"
+            >
+              <Loader2
+                className="w-8 h-8 mx-auto text-[var(--accent-mint)] animate-spin"
+                aria-hidden="true"
+              />
+              <p className="mt-3.5 font-display text-base font-semibold text-[var(--text-on-contrast)]">
+                Waiting for camera permission
+              </p>
+              <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-[var(--text-on-contrast-muted)]">
+                Respond to your browser’s permission prompt to preview your local camera feed.
+              </p>
+            </motion.div>
+          ) : isErrorLike ? (
+            <motion.div
+              key="error"
+              initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reducedMotion ? undefined : { opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: EASE_SIGNAL }}
+              className="px-6 py-8 text-center max-w-md"
+              role="alert"
+            >
+              <ShieldAlert className="w-8 h-8 mx-auto text-[var(--accent-coral)]" aria-hidden="true" />
+              <p className="mt-3.5 font-display text-base font-semibold text-[var(--text-on-contrast)]">
+                {STATUS_LABELS[status]}
+              </p>
+              <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-[var(--text-on-contrast-muted)]">
+                {errorDetail}
+              </p>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="off"
+              initial={reducedMotion ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={reducedMotion ? undefined : { opacity: 0, y: -8 }}
+              transition={{ duration: 0.2, ease: EASE_SIGNAL }}
+              className="px-6 py-8 text-center max-w-md"
+            >
+              <div className="w-12 h-12 mx-auto rounded-lg border contrast-border bg-[var(--bg-contrast-surface)] flex items-center justify-center text-[var(--text-on-contrast-muted)]">
+                <CameraOff className="w-5 h-5" aria-hidden="true" />
+              </div>
+              <p className="mt-4 font-display text-base font-semibold text-[var(--text-on-contrast)]">
+                Camera is currently off
+              </p>
+              <p className="mt-1.5 text-xs sm:text-sm leading-relaxed text-[var(--text-on-contrast-muted)]">
+                Select <span className="font-medium text-[var(--text-on-contrast)]">Start Camera</span>{' '}
+                to test your device’s live preview. Camera frames remain strictly local and are not
+                analysed in this prototype.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* Camera Action Bar */}
-      <div className="px-5 py-3.5 border-t hairline-border bg-[var(--bg-surface)] flex flex-wrap items-center justify-between gap-3">
+      <div className="px-5 py-4 border-t hairline-border bg-[var(--bg-surface)] flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-2.5">
-          <button
+          <motion.button
             type="button"
+            whileTap={reducedMotion ? undefined : { scale: 0.97 }}
             onClick={handleStartCamera}
             disabled={status === 'active' || status === 'requesting'}
-            className="inline-flex items-center justify-center gap-2 min-h-[42px] px-4 py-2 rounded-md bg-[var(--accent-primary)] text-[var(--accent-contrast-text)] text-sm font-semibold hover:bg-[var(--accent-primary-hover)] disabled:opacity-45 disabled:cursor-not-allowed transition-colors cursor-pointer whitespace-nowrap shrink-0"
+            className="inline-flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 rounded-md bg-[var(--accent-primary)] text-[var(--accent-contrast-text)] text-sm font-semibold hover:bg-[var(--accent-primary-hover)] disabled:opacity-45 disabled:cursor-not-allowed transition-colors cursor-pointer whitespace-nowrap shrink-0"
           >
             <Camera className="w-4 h-4" aria-hidden="true" />
             <span>Start Camera</span>
-          </button>
+          </motion.button>
 
-          <button
+          <motion.button
             type="button"
+            whileTap={reducedMotion ? undefined : { scale: 0.97 }}
             onClick={handleStopCamera}
             disabled={status !== 'active' && status !== 'requesting'}
-            className="inline-flex items-center justify-center gap-2 min-h-[42px] px-4 py-2 rounded-md border hairline-border-strong bg-[var(--bg-surface)] text-[var(--text-primary)] text-sm font-medium hover:border-[var(--accent-primary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer whitespace-nowrap shrink-0"
+            className="inline-flex items-center justify-center gap-2 min-h-[44px] px-4 py-2 rounded-md border hairline-border-strong bg-[var(--bg-surface)] text-[var(--text-primary)] text-sm font-medium hover:border-[var(--accent-primary)] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer whitespace-nowrap shrink-0"
           >
             <CameraOff className="w-4 h-4" aria-hidden="true" />
             <span>Stop Camera</span>
-          </button>
+          </motion.button>
         </div>
 
-        <span className="text-xs text-[var(--text-muted)]">User-initiated permission only</span>
+        <span className="font-mono text-xs text-[var(--text-muted)]">
+          User-initiated permission only
+        </span>
       </div>
     </div>
   );

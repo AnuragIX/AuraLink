@@ -4,6 +4,7 @@
  */
 
 import React, { useCallback, useEffect, useState } from 'react';
+import { MotionConfig } from 'motion/react';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import { Navbar } from './components/navigation/Navbar';
 import { HeroSection } from './components/hero/HeroSection';
@@ -96,8 +97,10 @@ function AuraLinkAppShell() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <AuraLinkAppShell />
-    </ThemeProvider>
+    <MotionConfig reducedMotion="user">
+      <ThemeProvider>
+        <AuraLinkAppShell />
+      </ThemeProvider>
+    </MotionConfig>
   );
 }

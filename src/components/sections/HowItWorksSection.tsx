@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Camera, Cpu, MessageSquareText } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
-import { Reveal, SectionHeader } from '../ui/MotionPrimitives';
+import { EASE_SIGNAL, Reveal, SectionHeader } from '../ui/MotionPrimitives';
 
 interface WorkflowStage {
   id: 'capture' | 'recognise' | 'communicate';
@@ -32,7 +32,7 @@ const STAGES: readonly WorkflowStage[] = [
     title: 'Recognise',
     headline: 'A future recognition engine analyses the hand configuration.',
     summary:
-      'The planned computer vision pipeline will detect 21-point hand joint landmarks across one or both hands and classify static and transitional Indian Sign Language alphabet signs.',
+      'The planned computer vision pipeline will detect spatial joint coordinates across one or both hands and classify static and transitional Indian Sign Language alphabet signs.',
     detail:
       'No live computer vision model runs in this prototype phase. Instead, the Translator workspace provides manual ISL A–Z selection so the downstream workflow can be tested accurately.',
     prototypeNote: 'Illustrative stage · ML recognition engine scheduled for a future phase',
@@ -54,53 +54,72 @@ function StageVisual({ stageId }: { stageId: WorkflowStage['id'] }) {
   if (stageId === 'capture') {
     return (
       <svg
-        viewBox="0 0 420 260"
+        viewBox="0 0 460 272"
         role="img"
-        aria-label="Illustrative diagram of stage 01 Capture: hand positioned within an optical camera frame"
+        aria-label="Abstract optical framing diagram for Stage 01 Capture: local camera viewport boundaries and spatial focal plane"
         className="w-full h-auto"
       >
-        {/* Framing reticle corners */}
-        <path d="M56 54 H90 M56 54 V88" stroke="var(--accent-primary)" strokeWidth="2" fill="none" />
-        <path d="M364 54 H330 M364 54 V88" stroke="var(--accent-primary)" strokeWidth="2" fill="none" />
-        <path d="M56 206 H90 M56 206 V172" stroke="var(--accent-primary)" strokeWidth="2" fill="none" />
-        <path d="M364 206 H330 M364 206 V172" stroke="var(--accent-primary)" strokeWidth="2" fill="none" />
+        {/* Optical viewport reticle corners */}
+        <path d="M54 44 H94 M54 44 V84" stroke="#FF725E" strokeWidth="2.2" fill="none" />
+        <path d="M406 44 H366 M406 44 V84" stroke="#FF725E" strokeWidth="2.2" fill="none" />
+        <path d="M54 216 H94 M54 216 V176" stroke="#FF725E" strokeWidth="2.2" fill="none" />
+        <path d="M406 216 H366 M406 216 V176" stroke="#FF725E" strokeWidth="2.2" fill="none" />
 
-        {/* Subtle horizon guide */}
+        {/* Subtle horizon & vertical alignment axes */}
         <line
-          x1="80"
+          x1="82"
           y1="130"
-          x2="340"
+          x2="378"
           y2="130"
-          stroke="var(--border-strong)"
+          stroke="rgba(244,241,234,0.16)"
+          strokeDasharray="4 6"
+          strokeWidth="1"
+        />
+        <line
+          x1="230"
+          y1="56"
+          x2="230"
+          y2="204"
+          stroke="rgba(244,241,234,0.16)"
           strokeDasharray="4 6"
           strokeWidth="1"
         />
 
-        {/* Stylized minimalist hand contour inside frame */}
-        <g transform="translate(210, 134)">
+        {/* Sculptural geometric optical aperture (abstract, no inaccurate gesture art) */}
+        <g transform="translate(230, 130)">
           <circle
-            r="62"
-            fill="var(--bg-surface-subtle)"
-            stroke="var(--border-hairline)"
-            strokeWidth="1"
+            r="68"
+            fill="rgba(49, 91, 255, 0.1)"
+            stroke="rgba(244, 241, 234, 0.22)"
+            strokeWidth="1.2"
           />
-          <path
-            d="M-18 32 L-22 2 C-23 -4 -15 -6 -13 0 L-10 14 L-9 -24 C-9 -30 -1 -30 0 -24 L1 8 L4 -30 C4 -36 12 -36 12 -30 L12 10 L18 -18 C19 -24 26 -22 25 -16 L20 20 C18 34 6 42 -6 40 C-14 39 -17 36 -18 32 Z"
+          <circle
+            r="46"
             fill="none"
-            stroke="var(--accent-primary)"
-            strokeWidth="2.2"
-            strokeLinejoin="round"
-            strokeLinecap="round"
+            stroke="#315BFF"
+            strokeWidth="1.8"
+            strokeDasharray="16 8"
           />
+          <rect
+            x="-22"
+            y="-22"
+            width="44"
+            height="44"
+            rx="10"
+            fill="rgba(255, 114, 94, 0.14)"
+            stroke="#FF725E"
+            strokeWidth="1.8"
+          />
+          <circle r="5" fill="#B7E5D1" />
         </g>
 
         <text
-          x="210"
-          y="236"
+          x="230"
+          y="248"
           textAnchor="middle"
-          fill="var(--text-muted)"
+          fill="#A6B6C5"
           fontSize="11"
-          fontFamily="JetBrains Mono, monospace"
+          fontFamily="IBM Plex Mono, monospace"
         >
           Stage 01 · Local Viewport Framing (Illustrative)
         </text>
@@ -111,68 +130,63 @@ function StageVisual({ stageId }: { stageId: WorkflowStage['id'] }) {
   if (stageId === 'recognise') {
     return (
       <svg
-        viewBox="0 0 420 260"
+        viewBox="0 0 460 272"
         role="img"
-        aria-label="Illustrative diagram of stage 02 Recognise: hand joint landmarks connected by spatial vectors"
+        aria-label="Abstract spatial vector diagram for Stage 02 Recognise: dual coordinate lattices representing planned two-handed ISL spatial analysis"
         className="w-full h-auto"
       >
-        {/* Concentric analysis arcs */}
+        {/* Concentric analysis orbits */}
         <circle
-          cx="210"
-          cy="124"
-          r="84"
+          cx="230"
+          cy="128"
+          r="86"
           fill="none"
-          stroke="var(--border-strong)"
-          strokeDasharray="3 5"
+          stroke="rgba(244,241,234,0.18)"
+          strokeDasharray="3 6"
         />
         <circle
-          cx="210"
-          cy="124"
+          cx="230"
+          cy="128"
           r="54"
           fill="none"
-          stroke="var(--accent-cyan)"
-          strokeOpacity="0.35"
+          stroke="rgba(183,229,209,0.34)"
+          strokeWidth="1.2"
         />
 
-        {/* Illustrative 21-point hand skeleton graph */}
-        <g stroke="var(--accent-primary)" strokeWidth="1.6" strokeOpacity="0.75" fill="none">
-          {/* Wrist to knuckles */}
-          <path d="M210 184 L178 148 L164 124 L158 106" />
-          <path d="M210 184 L194 134 L190 96 L189 72" />
-          <path d="M210 184 L211 130 L212 88 L213 62" />
-          <path d="M210 184 L228 134 L234 98 L238 76" />
-          <path d="M210 184 L244 146 L256 122 L264 104" />
-          {/* Palm cross-links */}
-          <path d="M178 148 L194 134 L211 130 L228 134 L244 146" strokeOpacity="0.45" />
+        {/* Left & Right geometric coordinate constellations (two-handed ISL spatial topology) */}
+        <g stroke="#315BFF" strokeWidth="1.6" strokeOpacity="0.88" fill="none">
+          <path d="M138 156 L166 106 L196 130 L172 164 Z" />
+          <path d="M166 106 L230 92 L294 106" stroke="#B7E5D1" strokeOpacity="0.6" />
+          <path d="M196 130 L264 130" stroke="#FF725E" strokeOpacity="0.85" />
+          <path d="M322 156 L294 106 L264 130 L288 164 Z" />
+          <path d="M172 164 L230 172 L288 164" strokeOpacity="0.55" />
         </g>
 
-        {/* Joint landmark nodes */}
+        {/* Coordinate nodes */}
         {[
-          [210, 184],
-          [178, 148], [164, 124], [158, 106],
-          [194, 134], [190, 96], [189, 72],
-          [211, 130], [212, 88], [213, 62],
-          [228, 134], [234, 98], [238, 76],
-          [244, 146], [256, 122], [264, 104],
-        ].map(([cx, cy], idx) => (
-          <circle
-            key={idx}
-            cx={cx}
-            cy={cy}
-            r={idx === 0 ? 4.5 : 3.2}
-            fill={idx % 3 === 0 ? 'var(--accent-primary)' : 'var(--text-primary)'}
-          />
+          { x: 138, y: 156, c: '#FF725E', r: 4.5 },
+          { x: 166, y: 106, c: '#F4F1EA', r: 3.8 },
+          { x: 196, y: 130, c: '#FF725E', r: 4.2 },
+          { x: 172, y: 164, c: '#F4F1EA', r: 3.4 },
+          { x: 230, y: 92, c: '#B7E5D1', r: 4.8 },
+          { x: 230, y: 172, c: '#315BFF', r: 4.5 },
+          { x: 264, y: 130, c: '#B7E5D1', r: 4.2 },
+          { x: 294, y: 106, c: '#F4F1EA', r: 3.8 },
+          { x: 322, y: 156, c: '#B7E5D1', r: 4.5 },
+          { x: 288, y: 164, c: '#F4F1EA', r: 3.4 },
+        ].map((pt, idx) => (
+          <circle key={idx} cx={pt.x} cy={pt.y} r={pt.r} fill={pt.c} />
         ))}
 
         <text
-          x="210"
-          y="236"
+          x="230"
+          y="248"
           textAnchor="middle"
-          fill="var(--text-muted)"
+          fill="#A6B6C5"
           fontSize="11"
-          fontFamily="JetBrains Mono, monospace"
+          fontFamily="IBM Plex Mono, monospace"
         >
-          Stage 02 · Planned Spatial Landmark Mapping (Illustrative)
+          Stage 02 · Planned Two-Handed Spatial Topology (Illustrative)
         </text>
       </svg>
     );
@@ -180,79 +194,79 @@ function StageVisual({ stageId }: { stageId: WorkflowStage['id'] }) {
 
   return (
     <svg
-      viewBox="0 0 420 260"
+      viewBox="0 0 460 272"
       role="img"
-      aria-label="Illustrative diagram of stage 03 Communicate: assembled readable text and speech waveform"
+      aria-label="Illustrative diagram of Stage 03 Communicate: assembled readable text and speech waveform"
       className="w-full h-auto"
     >
       {/* Text surface representation */}
       <rect
-        x="62"
-        y="46"
-        width="296"
-        height="76"
-        rx="8"
-        fill="var(--bg-surface-subtle)"
-        stroke="var(--border-strong)"
+        x="68"
+        y="42"
+        width="324"
+        height="82"
+        rx="10"
+        fill="#182534"
+        stroke="rgba(244,241,234,0.22)"
         strokeWidth="1.2"
       />
       <text
-        x="84"
-        y="76"
-        fill="var(--text-muted)"
+        x="92"
+        y="72"
+        fill="#B7E5D1"
         fontSize="10.5"
-        fontFamily="JetBrains Mono, monospace"
+        fontFamily="IBM Plex Mono, monospace"
       >
         OUTPUT TEXT
       </text>
       <text
-        x="84"
+        x="92"
         y="104"
-        fill="var(--text-primary)"
-        fontSize="20"
+        fill="#F4F1EA"
+        fontSize="22"
         fontWeight="700"
-        fontFamily="Plus Jakarta Sans, sans-serif"
-        letterSpacing="0.06em"
+        fontFamily="Space Grotesk, sans-serif"
+        letterSpacing="0.04em"
       >
         HELLO ISL
       </text>
 
       {/* Connector to acoustic wave */}
       <line
-        x1="210"
-        y1="122"
-        x2="210"
-        y2="148"
-        stroke="var(--accent-primary)"
-        strokeWidth="1.5"
+        x1="230"
+        y1="124"
+        x2="230"
+        y2="152"
+        stroke="#315BFF"
+        strokeWidth="1.8"
         strokeDasharray="3 3"
       />
 
       {/* Acoustic waveform bars */}
-      <g transform="translate(88, 178)">
-        {[14, 24, 38, 18, 44, 30, 50, 26, 40, 22, 34, 16, 28, 18, 12].map((h, i) => (
+      <g transform="translate(104, 184)">
+        {[14, 24, 40, 20, 48, 32, 54, 28, 42, 22, 36, 18, 30, 20, 14].map((h, i) => (
           <rect
             key={i}
-            x={i * 16.5}
+            x={i * 17}
             y={-h / 2}
-            width="6"
+            width="6.5"
             height={h}
-            rx="3"
-            fill={i % 2 === 0 ? 'var(--accent-primary)' : 'var(--accent-cyan)'}
-            fillOpacity={0.45 + (h / 50) * 0.55}
+            rx="3.25"
+            fill={i % 3 === 0 ? '#FF725E' : i % 2 === 0 ? '#315BFF' : '#B7E5D1'}
+            fillOpacity={0.55 + (h / 54) * 0.45}
           />
         ))}
       </g>
 
       <text
-        x="210"
-        y="236"
+        x="230"
+        y="248"
         textAnchor="middle"
-        fill="var(--text-muted)"
+        fill="#A6B6C5"
         fontSize="11"
-        fontFamily="JetBrains Mono, monospace"
+        fontFamily="IBM Plex Mono, monospace"
       >
-        Stage 03 · Legible Text & Browser Speech Output
+        Stage 03 · Legible Text &amp; Browser Speech Output
       </text>
     </svg>
   );
@@ -293,29 +307,36 @@ export function HowItWorksSection() {
     <section
       id="how-it-works"
       aria-labelledby="how-it-works-heading"
-      className="py-20 sm:py-24 lg:py-32 border-t hairline-border bg-[var(--bg-surface-subtle)]/45"
+      className="relative py-20 sm:py-28 lg:py-32 bg-[var(--bg-contrast)] text-[var(--text-on-contrast)] border-t contrast-border overflow-x-clip"
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 contrast-grid-bg opacity-45 [mask-image:radial-gradient(ellipse_75%_65%_at_50%_40%,#000_25%,transparent_100%)]"
+      />
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <SectionHeader
+              index="02"
+              tone="contrast"
               headingId="how-it-works-heading"
               kicker="How AuraLink Works"
               title="Three stages from visual sign to shared language."
-              description="Explore the intended end-to-end communication architecture. The visual sequence below is illustrative of how AuraLink AI will operate once the recognition engine is integrated."
+              description="Explore the intended end-to-end communication architecture. The sequence below illustrates how AuraLink AI is designed to operate once the recognition engine is integrated."
             />
-            <p className="text-xs font-mono text-[var(--text-muted)] lg:text-right shrink-0">
+            <p className="text-xs font-mono text-[var(--accent-mint)] lg:text-right shrink-0">
               Illustrative Workflow · Prototype Phase
             </p>
           </div>
         </Reveal>
 
-        <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-          {/* Stage Selector List */}
+        <div className="mt-14 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-stretch">
+          {/* Interactive Stage Selector List */}
           <div
             role="tablist"
             aria-label="How AuraLink AI works stages"
-            className="lg:col-span-5 flex flex-col gap-3"
+            className="lg:col-span-5 flex flex-col divide-y divide-[var(--border-on-contrast)] border-y contrast-border"
           >
             {STAGES.map((stage, index) => {
               const isSelected = index === activeIndex;
@@ -330,28 +351,37 @@ export function HowItWorksSection() {
                   aria-controls={`stage-panel-${stage.id}`}
                   onClick={() => setActiveIndex(index)}
                   onKeyDown={(e) => handleTabKeyDown(e, index)}
-                  className={`text-left p-5 sm:p-6 rounded-xl border transition-colors cursor-pointer ${
+                  className={`relative text-left py-6 px-4 sm:px-5 transition-colors cursor-pointer ${
                     isSelected
-                      ? 'bg-[var(--bg-surface)] border-[var(--accent-primary)]'
-                      : 'bg-[var(--bg-surface)]/55 hairline-border hover:border-[var(--border-strong)]'
+                      ? 'bg-[var(--bg-contrast-surface)]'
+                      : 'hover:bg-[var(--bg-contrast-surface)]/45'
                   }`}
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <span className="font-mono text-xs font-medium text-[var(--accent-cyan)]">
-                      {stage.number} — {stage.title}
+                    <span
+                      className={`font-mono text-xs font-medium tabular-nums ${
+                        isSelected
+                          ? 'text-[var(--accent-mint)]'
+                          : 'text-[var(--text-on-contrast-muted)]'
+                      }`}
+                    >
+                      {stage.number} / {stage.title}
                     </span>
                     <span
                       className={
-                        isSelected ? 'text-[var(--accent-primary)]' : 'text-[var(--text-muted)]'
+                        isSelected
+                          ? 'text-[var(--accent-coral)]'
+                          : 'text-[var(--text-on-contrast-muted)]'
                       }
                     >
                       {getIcon(stage.id)}
                     </span>
                   </div>
-                  <h3 className="mt-2 font-display text-lg font-bold text-[var(--text-primary)]">
+
+                  <h3 className="mt-2.5 font-display text-lg sm:text-xl font-bold tracking-[-0.02em] text-[var(--text-on-contrast)]">
                     {stage.headline}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
+                  <p className="mt-2 text-sm leading-relaxed text-[var(--text-on-contrast-muted)]">
                     {stage.summary}
                   </p>
                 </button>
@@ -359,58 +389,59 @@ export function HowItWorksSection() {
             })}
           </div>
 
-          {/* Interactive Stage Visualizer Panel */}
+          {/* Interactive Stage Visualizer Stage */}
           <div className="lg:col-span-7 flex">
             <div
               role="tabpanel"
               id={`stage-panel-${activeStage.id}`}
               aria-labelledby={`stage-tab-${activeStage.id}`}
-              className="w-full rounded-xl border hairline-border bg-[var(--bg-surface)] p-6 sm:p-8 flex flex-col justify-between"
+              className="w-full rounded-xl border contrast-border bg-[var(--bg-contrast-surface)] p-6 sm:p-8 flex flex-col justify-between"
             >
-              <div className="flex flex-wrap items-center justify-between gap-2 pb-4 border-b hairline-border">
-                <div className="flex items-center gap-2.5 text-sm font-semibold text-[var(--text-primary)]">
-                  <span className="font-mono text-[var(--accent-primary)]">
+              <div className="flex flex-wrap items-center justify-between gap-3 pb-4 border-b contrast-border">
+                <div className="flex items-center gap-2.5 text-sm font-semibold text-[var(--text-on-contrast)]">
+                  <span className="font-mono text-[var(--accent-coral)] tabular-nums">
                     {activeStage.number}
                   </span>
                   <span>{activeStage.title} Stage</span>
                 </div>
-                <div className="flex items-center gap-1.5">
+
+                <div className="flex items-center gap-2">
                   {STAGES.map((st, idx) => (
                     <button
                       key={st.id}
                       type="button"
                       onClick={() => setActiveIndex(idx)}
                       aria-label={`View stage ${st.number} ${st.title}`}
-                      className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                      className={`h-2 rounded-full transition-all cursor-pointer ${
                         idx === activeIndex
-                          ? 'w-7 bg-[var(--accent-primary)]'
-                          : 'w-2.5 bg-[var(--border-strong)] hover:bg-[var(--text-muted)]'
+                          ? 'w-8 bg-[var(--accent-mint)]'
+                          : 'w-2.5 bg-[var(--border-on-contrast-strong)] hover:bg-[var(--text-on-contrast-muted)]'
                       }`}
                     />
                   ))}
                 </div>
               </div>
 
-              <div className="my-6 flex-1 flex items-center justify-center min-h-[240px]">
+              <div className="my-6 flex-1 flex items-center justify-center min-h-[250px]">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={activeStage.id}
-                    initial={reducedMotion ? false : { opacity: 0, y: 10 }}
+                    initial={reducedMotion ? false : { opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
-                    exit={reducedMotion ? undefined : { opacity: 0, y: -10 }}
-                    transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                    className="w-full max-w-md mx-auto"
+                    exit={reducedMotion ? undefined : { opacity: 0, y: -12 }}
+                    transition={{ duration: 0.24, ease: EASE_SIGNAL }}
+                    className="w-full max-w-lg mx-auto"
                   >
                     <StageVisual stageId={activeStage.id} />
                   </motion.div>
                 </AnimatePresence>
               </div>
 
-              <div className="pt-5 border-t hairline-border space-y-2">
-                <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
+              <div className="pt-5 border-t contrast-border space-y-2">
+                <p className="text-sm sm:text-[15px] leading-relaxed text-[var(--text-on-contrast)]/90">
                   {activeStage.detail}
                 </p>
-                <p className="font-mono text-xs text-[var(--text-muted)]">
+                <p className="font-mono text-xs text-[var(--accent-mint)]">
                   {activeStage.prototypeNote}
                 </p>
               </div>

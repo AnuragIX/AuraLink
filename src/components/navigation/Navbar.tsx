@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Menu, Moon, Sun, X, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight, Menu, Moon, Sun, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useTheme } from '../../context/ThemeContext';
+import { EASE_SIGNAL, ScrollProgressBar } from '../ui/MotionPrimitives';
 
 export interface NavItem {
   id: string;
@@ -17,38 +18,40 @@ export const NAV_ITEMS: readonly NavItem[] = [
   { id: 'about', label: 'About', href: '#about' },
 ];
 
-export function AuraLinkMark() {
+export function AuraLinkMark({ onContrast = false }: { onContrast?: boolean }) {
   return (
     <svg
-      width="26"
-      height="26"
+      width="28"
+      height="28"
       viewBox="0 0 28 28"
       fill="none"
       aria-hidden="true"
       className="shrink-0"
     >
-      <circle
-        cx="14"
-        cy="14"
-        r="11.5"
+      <rect
+        x="1.5"
+        y="1.5"
+        width="25"
+        height="25"
+        rx="6"
         stroke="currentColor"
-        strokeOpacity="0.28"
+        strokeOpacity={onContrast ? '0.26' : '0.2'}
         strokeWidth="1.25"
       />
       <path
-        d="M6.5 16.5C9.5 11.5 18.5 11.5 21.5 16.5"
+        d="M6.5 17.5C9.5 11.8 18.5 11.8 21.5 17.5"
         stroke="var(--accent-primary)"
-        strokeWidth="1.8"
+        strokeWidth="2"
         strokeLinecap="round"
       />
       <path
-        d="M9.5 12C11.8 8.8 16.2 8.8 18.5 12"
-        stroke="currentColor"
+        d="M9.75 12.2C12 8.8 16 8.8 18.25 12.2"
+        stroke={onContrast ? 'var(--accent-mint)' : 'currentColor'}
         strokeWidth="1.5"
         strokeLinecap="round"
-        strokeOpacity="0.85"
+        strokeOpacity={onContrast ? '0.95' : '0.82'}
       />
-      <circle cx="14" cy="18.2" r="2.1" fill="var(--accent-primary)" />
+      <circle cx="14" cy="18.6" r="2.3" fill="var(--accent-coral)" />
     </svg>
   );
 }
@@ -65,7 +68,7 @@ export function Navbar({ activeSection, onNavigate }: NavbarProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 18);
+      setIsScrolled(window.scrollY > 20);
     };
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -93,28 +96,25 @@ export function Navbar({ activeSection, onNavigate }: NavbarProps) {
     <header
       className={`fixed top-0 inset-x-0 z-50 transition-colors duration-200 ${
         isScrolled
-          ? 'bg-[var(--bg-canvas)]/88 backdrop-blur-md border-b hairline-border'
-          : 'bg-transparent border-b border-transparent'
+          ? 'bg-[var(--bg-canvas)]/92 backdrop-blur-md border-b hairline-border'
+          : 'bg-[var(--bg-canvas)]/75 backdrop-blur-sm border-b border-transparent'
       }`}
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-6">
-        {/* Zone 1: Single-line Brand Identity */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-8">
+        {/* Zone 1: Single-line Brand Wordmark */}
         <a
           href="#home"
           onClick={(e) => handleLinkClick(e, 'home')}
-          className="flex items-center gap-2.5 text-[var(--text-primary)] whitespace-nowrap shrink-0 focus-visible:rounded-sm"
+          className="flex items-center gap-2.5 text-[var(--text-primary)] whitespace-nowrap shrink-0 focus-visible:rounded-sm group"
         >
           <AuraLinkMark />
-          <span className="font-display text-base sm:text-lg font-bold tracking-[-0.02em]">
+          <span className="font-display text-base sm:text-lg font-bold tracking-[-0.03em]">
             AuraLink AI
           </span>
         </a>
 
-        {/* Zone 2: Clean Desktop Navigation Links */}
-        <nav
-          aria-label="Primary navigation"
-          className="hidden md:flex items-center gap-7"
-        >
+        {/* Zone 2: Primary Single-Line Navigation Links */}
+        <nav aria-label="Primary navigation" className="hidden md:flex items-center gap-7">
           {NAV_ITEMS.map((item) => {
             const isActive = activeSection === item.id;
             return (
@@ -133,7 +133,7 @@ export function Navbar({ activeSection, onNavigate }: NavbarProps) {
                 {isActive ? (
                   <motion.span
                     layoutId={reducedMotion ? undefined : 'nav-active-underline'}
-                    transition={{ type: 'spring', stiffness: 420, damping: 36 }}
+                    transition={{ type: 'spring', stiffness: 460, damping: 36 }}
                     className="absolute inset-x-0 -bottom-px h-[2px] bg-[var(--accent-primary)]"
                     aria-hidden="true"
                   />
@@ -143,26 +143,39 @@ export function Navbar({ activeSection, onNavigate }: NavbarProps) {
           })}
         </nav>
 
-        {/* Zone 3: Theme Switcher + Primary CTA + Mobile Toggle */}
+        {/* Zone 3: Theme Toggle + Primary Action + Mobile Trigger */}
         <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-          <button
+          <motion.button
             type="button"
             onClick={toggleTheme}
+            whileTap={reducedMotion ? undefined : { scale: 0.94 }}
             aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
             title={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-            className="inline-flex items-center justify-center w-10 h-10 rounded-md border hairline-border bg-[var(--bg-surface)]/80 text-[var(--text-primary)] hover:border-[var(--accent-primary)] transition-colors cursor-pointer shrink-0"
+            className="inline-flex items-center justify-center w-10 h-10 rounded-md border hairline-border bg-[var(--bg-surface)] text-[var(--text-primary)] hover:border-[var(--accent-primary)] transition-colors cursor-pointer shrink-0"
           >
-            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-          </button>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={theme}
+                initial={reducedMotion ? false : { opacity: 0, rotate: -35, scale: 0.8 }}
+                animate={{ opacity: 1, rotate: 0, scale: 1 }}
+                exit={reducedMotion ? undefined : { opacity: 0, rotate: 35, scale: 0.8 }}
+                transition={{ duration: 0.16, ease: EASE_SIGNAL }}
+                className="flex items-center justify-center"
+              >
+                {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </motion.span>
+            </AnimatePresence>
+          </motion.button>
 
-          <a
+          <motion.a
             href="#translator"
             onClick={(e) => handleLinkClick(e, 'translator')}
+            whileTap={reducedMotion ? undefined : { scale: 0.97 }}
             className="hidden sm:inline-flex items-center gap-1.5 px-4 py-2 text-sm font-semibold rounded-md bg-[var(--accent-primary)] text-[var(--accent-contrast-text)] hover:bg-[var(--accent-primary-hover)] transition-colors whitespace-nowrap shrink-0"
           >
             <span>Try AuraLink</span>
             <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
-          </a>
+          </motion.a>
 
           <button
             type="button"
@@ -170,11 +183,16 @@ export function Navbar({ activeSection, onNavigate }: NavbarProps) {
             aria-expanded={mobileMenuOpen}
             aria-controls="mobile-navigation-drawer"
             aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            className="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-md border hairline-border bg-[var(--bg-surface)]/90 text-[var(--text-primary)] hover:border-[var(--accent-primary)] transition-colors cursor-pointer shrink-0"
+            className="md:hidden inline-flex items-center justify-center w-11 h-11 rounded-md border hairline-border bg-[var(--bg-surface)] text-[var(--text-primary)] hover:border-[var(--accent-primary)] transition-colors cursor-pointer shrink-0"
           >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
+      </div>
+
+      {/* Subtle Scroll Progress Hairline */}
+      <div className="h-[2px] w-full overflow-hidden">
+        <ScrollProgressBar />
       </div>
 
       {/* Mobile Navigation Drawer */}
@@ -182,32 +200,35 @@ export function Navbar({ activeSection, onNavigate }: NavbarProps) {
         {mobileMenuOpen ? (
           <motion.div
             id="mobile-navigation-drawer"
-            initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: -8 }}
+            initial={reducedMotion ? { opacity: 1 } : { opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -8 }}
-            transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-            className="md:hidden border-b hairline-border bg-[var(--bg-surface)] shadow-lg"
+            exit={reducedMotion ? { opacity: 0 } : { opacity: 0, y: -10 }}
+            transition={{ duration: 0.2, ease: EASE_SIGNAL }}
+            className="md:hidden border-b hairline-border bg-[var(--bg-surface)] shadow-xl"
           >
             <nav aria-label="Mobile navigation" className="px-4 py-4 flex flex-col gap-1">
-              {NAV_ITEMS.map((item) => {
+              {NAV_ITEMS.map((item, idx) => {
                 const isActive = activeSection === item.id;
                 return (
-                  <a
+                  <motion.a
                     key={item.id}
                     href={item.href}
+                    initial={reducedMotion ? false : { opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.2, delay: idx * 0.03, ease: EASE_SIGNAL }}
                     onClick={(e) => handleLinkClick(e, item.id)}
                     aria-current={isActive ? 'location' : undefined}
-                    className={`flex items-center justify-between min-h-[44px] px-3 rounded-md text-base font-medium transition-colors ${
+                    className={`flex items-center justify-between min-h-[44px] px-3.5 rounded-md text-base font-medium transition-colors ${
                       isActive
-                        ? 'bg-[var(--bg-surface-subtle)] text-[var(--accent-primary)]'
+                        ? 'bg-[var(--bg-surface-subtle)] text-[var(--accent-ink)]'
                         : 'text-[var(--text-primary)] hover:bg-[var(--bg-surface-subtle)]'
                     }`}
                   >
                     <span>{item.label}</span>
-                    {isActive ? (
-                      <span className="text-xs font-mono text-[var(--accent-cyan)]">Active</span>
-                    ) : null}
-                  </a>
+                    <span className="font-mono text-xs text-[var(--text-muted)]">
+                      {isActive ? 'Current' : `0${idx + 1}`}
+                    </span>
+                  </motion.a>
                 );
               })}
 

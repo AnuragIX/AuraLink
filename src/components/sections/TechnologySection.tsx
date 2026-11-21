@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Reveal, SectionHeader } from '../ui/MotionPrimitives';
+import { AnimatePresence, motion } from 'motion/react';
+import { useTheme } from '../../context/ThemeContext';
+import { EASE_SIGNAL, Reveal, SectionHeader } from '../ui/MotionPrimitives';
 
 interface TechLayer {
   id: string;
@@ -69,6 +71,7 @@ const TECH_LAYERS: readonly TechLayer[] = [
 ];
 
 export function TechnologySection() {
+  const { reducedMotion } = useTheme();
   const [selectedLayerId, setSelectedLayerId] = useState<string>(TECH_LAYERS[1].id);
   const selectedLayer =
     TECH_LAYERS.find((layer) => layer.id === selectedLayerId) ?? TECH_LAYERS[0];
@@ -77,12 +80,13 @@ export function TechnologySection() {
     <section
       id="technology"
       aria-labelledby="technology-heading"
-      className="py-20 sm:py-24 lg:py-32 border-t hairline-border"
+      className="py-20 sm:py-28 lg:py-32 border-t hairline-border bg-[var(--bg-canvas)]"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <Reveal>
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
             <SectionHeader
+              index="05"
               headingId="technology-heading"
               kicker="Technology Direction"
               title="Architectural blueprint for Indian Sign Language recognition."
@@ -94,16 +98,16 @@ export function TechnologySection() {
           </div>
         </Reveal>
 
-        <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+        <div className="mt-14 grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
           {/* Interactive Spatial Blueprint Diagram */}
           <Reveal className="lg:col-span-5 flex">
-            <div className="w-full rounded-xl border hairline-border bg-[var(--bg-surface)] p-6 sm:p-8 flex flex-col justify-between">
-              <div className="flex items-center justify-between gap-2 pb-4 border-b hairline-border">
-                <span className="font-display text-sm font-semibold text-[var(--text-primary)]">
-                  Spatial Landmark Blueprint
+            <div className="w-full rounded-xl bg-[var(--bg-contrast)] text-[var(--text-on-contrast)] border contrast-border p-6 sm:p-8 flex flex-col justify-between">
+              <div className="flex items-center justify-between gap-2 pb-4 border-b contrast-border">
+                <span className="font-display text-sm font-semibold text-[var(--text-on-contrast)]">
+                  Spatial Pipeline Blueprint
                 </span>
-                <span className="font-mono text-xs text-[var(--accent-cyan)]">
-                  Layer {selectedLayer.order}
+                <span className="font-mono text-xs text-[var(--accent-mint)] tabular-nums">
+                  Layer {selectedLayer.order} / 06
                 </span>
               </div>
 
@@ -111,7 +115,7 @@ export function TechnologySection() {
                 <svg
                   viewBox="0 0 360 300"
                   role="img"
-                  aria-label={`Architectural diagram highlighting ${selectedLayer.name}`}
+                  aria-label={`Architectural blueprint highlighting ${selectedLayer.name}`}
                   className="w-full max-w-[340px] h-auto"
                 >
                   {/* Layer 01: Outer optical frame */}
@@ -121,137 +125,138 @@ export function TechnologySection() {
                     width="316"
                     height="196"
                     rx="10"
-                    fill="var(--bg-surface-subtle)"
-                    fillOpacity="0.6"
+                    fill="#182534"
                     stroke={
                       selectedLayer.highlightZone === 'frame'
-                        ? 'var(--accent-primary)'
-                        : 'var(--border-hairline)'
+                        ? '#FF725E'
+                        : 'rgba(244,241,234,0.16)'
                     }
-                    strokeWidth={selectedLayer.highlightZone === 'frame' ? '2' : '1'}
+                    strokeWidth={selectedLayer.highlightZone === 'frame' ? '2.2' : '1'}
                   />
 
-                  {/* Concentric spatial coordinate rings (Layer 03 / ML geometry) */}
+                  {/* Layer 03 & 04: Spatial coordinate rings */}
                   <circle
                     cx="180"
                     cy="116"
-                    r="78"
+                    r="76"
                     fill="none"
                     stroke={
                       selectedLayer.highlightZone === 'vectors'
-                        ? 'var(--accent-primary)'
-                        : 'var(--border-strong)'
+                        ? '#315BFF'
+                        : 'rgba(244,241,234,0.2)'
                     }
-                    strokeWidth={selectedLayer.highlightZone === 'vectors' ? '1.8' : '1'}
+                    strokeWidth={selectedLayer.highlightZone === 'vectors' ? '2' : '1'}
                     strokeDasharray="4 5"
                   />
                   <circle
                     cx="180"
                     cy="116"
-                    r="48"
+                    r="44"
                     fill="none"
                     stroke={
                       selectedLayer.highlightZone === 'classifier'
-                        ? 'var(--accent-primary)'
-                        : 'var(--border-hairline)'
+                        ? '#B7E5D1'
+                        : 'rgba(244,241,234,0.14)'
                     }
-                    strokeWidth={selectedLayer.highlightZone === 'classifier' ? '1.8' : '1'}
+                    strokeWidth={selectedLayer.highlightZone === 'classifier' ? '2' : '1'}
                   />
 
-                  {/* Hand Landmark Skeleton (Layer 02) */}
+                  {/* Layer 02: Abstract dual-cluster spatial coordinate lattice */}
                   <g
                     stroke={
                       selectedLayer.highlightZone === 'landmarks' ||
                       selectedLayer.highlightZone === 'vectors'
-                        ? 'var(--accent-primary)'
-                        : 'var(--text-secondary)'
-                    }
-                    strokeOpacity={
-                      selectedLayer.highlightZone === 'landmarks' ? '0.95' : '0.45'
+                        ? '#315BFF'
+                        : 'rgba(244,241,234,0.4)'
                     }
                     strokeWidth="1.6"
                     fill="none"
                   >
-                    <path d="M180 182 L148 144 L132 118 L124 98" />
-                    <path d="M180 182 L162 128 L158 88 L156 62" />
-                    <path d="M180 182 L180 122 L180 78 L180 50" />
-                    <path d="M180 182 L198 128 L204 88 L208 66" />
-                    <path d="M180 182 L214 142 L226 116 L236 98" />
-                    <path d="M148 144 L162 128 L180 122 L198 128 L214 142" />
+                    <path d="M112 142 L134 94 L162 114 L142 152 Z" />
+                    <path d="M134 94 L180 82 L226 94" />
+                    <path d="M162 114 L198 114" />
+                    <path d="M248 142 L226 94 L198 114 L218 152 Z" />
+                    <path d="M142 152 L180 158 L218 152" />
                   </g>
 
                   {[
-                    [180, 182],
-                    [148, 144], [132, 118], [124, 98],
-                    [162, 128], [158, 88], [156, 62],
-                    [180, 122], [180, 78], [180, 50],
-                    [198, 128], [204, 88], [208, 66],
-                    [214, 142], [226, 116], [236, 98],
+                    [112, 142],
+                    [134, 94],
+                    [162, 114],
+                    [142, 152],
+                    [180, 82],
+                    [180, 158],
+                    [198, 114],
+                    [226, 94],
+                    [248, 142],
+                    [218, 152],
                   ].map(([cx, cy], i) => (
                     <circle
                       key={i}
                       cx={cx}
                       cy={cy}
-                      r={selectedLayer.highlightZone === 'landmarks' ? 4 : 2.8}
+                      r={selectedLayer.highlightZone === 'landmarks' ? 4.4 : 3}
                       fill={
-                        selectedLayer.highlightZone === 'landmarks' ||
-                        selectedLayer.highlightZone === 'classifier'
-                          ? 'var(--accent-primary)'
-                          : 'var(--text-primary)'
+                        selectedLayer.highlightZone === 'landmarks'
+                          ? '#FF725E'
+                          : selectedLayer.highlightZone === 'classifier'
+                            ? '#B7E5D1'
+                            : '#F4F1EA'
                       }
                     />
                   ))}
 
-                  {/* Output Bar (Layer 05 & 06) */}
+                  {/* Layer 05: Text Output Layer */}
                   <rect
                     x="22"
                     y="232"
                     width="190"
-                    height="48"
+                    height="50"
                     rx="8"
-                    fill="var(--bg-surface-subtle)"
+                    fill="#182534"
                     stroke={
                       selectedLayer.highlightZone === 'text'
-                        ? 'var(--accent-primary)'
-                        : 'var(--border-hairline)'
+                        ? '#315BFF'
+                        : 'rgba(244,241,234,0.16)'
                     }
-                    strokeWidth={selectedLayer.highlightZone === 'text' ? '1.8' : '1'}
+                    strokeWidth={selectedLayer.highlightZone === 'text' ? '2' : '1'}
                   />
                   <text
                     x="38"
                     y="252"
-                    fill="var(--text-muted)"
+                    fill="#A6B6C5"
                     fontSize="9.5"
-                    fontFamily="JetBrains Mono, monospace"
+                    fontFamily="IBM Plex Mono, monospace"
                   >
                     TEXT LAYER
                   </text>
                   <text
                     x="38"
-                    y="270"
-                    fill="var(--text-primary)"
+                    y="271"
+                    fill="#F4F1EA"
                     fontSize="13"
                     fontWeight="700"
-                    fontFamily="Plus Jakarta Sans, sans-serif"
+                    fontFamily="Space Grotesk, sans-serif"
                   >
                     ISL → Readable Output
                   </text>
 
+                  {/* Layer 06: Speech Output Layer */}
                   <rect
                     x="224"
                     y="232"
                     width="114"
-                    height="48"
+                    height="50"
                     rx="8"
-                    fill="var(--bg-surface-subtle)"
+                    fill="#182534"
                     stroke={
                       selectedLayer.highlightZone === 'audio'
-                        ? 'var(--accent-primary)'
-                        : 'var(--border-hairline)'
+                        ? '#B7E5D1'
+                        : 'rgba(244,241,234,0.16)'
                     }
-                    strokeWidth={selectedLayer.highlightZone === 'audio' ? '1.8' : '1'}
+                    strokeWidth={selectedLayer.highlightZone === 'audio' ? '2' : '1'}
                   />
-                  <g transform="translate(244, 256)">
+                  <g transform="translate(244, 257)">
                     {[8, 18, 12, 24, 14, 20, 10, 16].map((h, i) => (
                       <rect
                         key={i}
@@ -262,8 +267,8 @@ export function TechnologySection() {
                         rx="2"
                         fill={
                           selectedLayer.highlightZone === 'audio'
-                            ? 'var(--accent-primary)'
-                            : 'var(--text-muted)'
+                            ? '#B7E5D1'
+                            : 'rgba(244,241,234,0.45)'
                         }
                       />
                     ))}
@@ -271,53 +276,67 @@ export function TechnologySection() {
                 </svg>
               </div>
 
-              <div className="pt-4 border-t hairline-border">
-                <p className="text-xs font-mono text-[var(--accent-cyan)]">
-                  {selectedLayer.order} · {selectedLayer.phase}
-                </p>
-                <p className="mt-1 font-display text-base font-bold text-[var(--text-primary)]">
-                  {selectedLayer.name}
-                </p>
-                <p className="mt-1.5 text-sm leading-relaxed text-[var(--text-secondary)]">
-                  {selectedLayer.engineeringFocus}
-                </p>
-              </div>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedLayer.id}
+                  initial={reducedMotion ? false : { opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={reducedMotion ? undefined : { opacity: 0, y: -6 }}
+                  transition={{ duration: 0.18, ease: EASE_SIGNAL }}
+                  className="pt-4 border-t contrast-border"
+                >
+                  <p className="text-xs font-mono text-[var(--accent-coral)]">
+                    {selectedLayer.order} · {selectedLayer.phase}
+                  </p>
+                  <p className="mt-1 font-display text-base font-bold text-[var(--text-on-contrast)]">
+                    {selectedLayer.name}
+                  </p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-[var(--text-on-contrast-muted)]">
+                    {selectedLayer.engineeringFocus}
+                  </p>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </Reveal>
 
-          {/* Interactive 6-Layer Technical Stack List */}
+          {/* Interactive 6-Layer Technical Stack Grid */}
           <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
             {TECH_LAYERS.map((layer) => {
               const isSelected = layer.id === selectedLayer.id;
               return (
-                <button
+                <motion.button
                   key={layer.id}
                   type="button"
+                  whileTap={reducedMotion ? undefined : { scale: 0.985 }}
                   onClick={() => setSelectedLayerId(layer.id)}
                   aria-pressed={isSelected}
                   className={`text-left rounded-xl border p-5 sm:p-6 transition-colors cursor-pointer flex flex-col justify-between ${
                     isSelected
                       ? 'bg-[var(--bg-surface)] border-[var(--accent-primary)]'
-                      : 'bg-[var(--bg-surface)]/70 hairline-border hover:border-[var(--border-strong)]'
+                      : 'bg-[var(--bg-surface)]/55 hairline-border hover:border-[var(--border-strong)] hover:bg-[var(--bg-surface)]'
                   }`}
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-mono text-xs text-[var(--accent-cyan)]">
+                      <span
+                        className={`font-mono text-xs font-medium tabular-nums ${
+                          isSelected ? 'text-[var(--accent-ink)]' : 'text-[var(--text-muted)]'
+                        }`}
+                      >
                         {layer.order}
                       </span>
                       <span className="text-[11px] font-mono text-[var(--text-muted)]">
                         {layer.phase}
                       </span>
                     </div>
-                    <h3 className="mt-3 font-display text-lg font-bold text-[var(--text-primary)]">
+                    <h3 className="mt-3 font-display text-lg font-bold tracking-[-0.015em] text-[var(--text-primary)]">
                       {layer.name}
                     </h3>
                     <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">
                       {layer.role}
                     </p>
                   </div>
-                </button>
+                </motion.button>
               );
             })}
           </div>
